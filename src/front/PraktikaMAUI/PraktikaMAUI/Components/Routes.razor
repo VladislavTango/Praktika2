@@ -1,0 +1,31 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+@inject NavigationManager NavigationManager
+
+
+<Router AppAssembly="@typeof(MauiProgram).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+</Router>
+<AntContainer />
+
+@code {
+    private string initialRoute;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userLoggedIn = await _localStorage.GetItemAsStringAsync("Token");
+
+        if (string.IsNullOrEmpty(userLoggedIn))
+        {
+            initialRoute = "/"; 
+        }
+        else
+        {
+            initialRoute = "/StartPage";
+        }
+
+        NavigationManager.NavigateTo(initialRoute);
+    }
+}

@@ -1,0 +1,66 @@
+﻿@page "/"
+@inject IMessageService _message
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+@inject NavigationManager NavigationManager
+
+<link href="css/AuthPages.css" rel="stylesheet" />
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+        </div>
+        <div class="col-6 Block">
+            <h1>Регистрация</h1>
+            <div class="forms">
+                <Space Direction="@DirectionVHType.Vertical">
+                    <SpaceItem>
+                        <Input Placeholder="Имя пользователя"  Size="@InputSize.Large" @bind-Value="@UserName" >
+                            <Prefix>
+                                <Icon Type="user" />
+                            </Prefix>
+                        </Input>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <InputPassword @bind-Value="@Fpassword" Placeholder="Пароль" Size="@InputSize.Large"  />
+                    </SpaceItem>
+                    <SpaceItem>
+                        <InputPassword @bind-Value="@Spassword" Placeholder="Повторите пароль" Size="@InputSize.Large"  />
+                    </SpaceItem>
+                    <SpaceItem>
+                        <textarea rows="4" @bind = "UserContacts"  class="ant-input" placeholder="Ваши контакты"></textarea>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Input @bind-Value="@UserEmail" Placeholder="Email" Size="@InputSize.Large"/>
+                    </SpaceItem>
+                    <SpaceItem>
+
+                        <Button Type="@ButtonType.Primary"
+                        AutoLoading
+                        OnClick="SendEmailCode">
+                            Отправить код
+                        </Button>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Input Placeholder="Код" @bind-Value="@Code"  />
+                    </SpaceItem>
+                    <Button Type="@ButtonType.Primary"
+                    AutoLoading
+                    OnClick="EnterNoIconLoading">
+                        Зарегистрироваться
+                    </Button>
+                    <br>
+                    <Link><h4><a href="Login">Уже есть аккаунт?</a></h4></Link>
+
+                </Space>
+            </div>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+</div>
+
+@code {
+    RenderFragment actionSetting(Func<Task> clickActionAsync, Dictionary<string, object> iconAttributes) =>
+    @<Icon @attributes="@iconAttributes" OnClick="@clickActionAsync" />;
+}

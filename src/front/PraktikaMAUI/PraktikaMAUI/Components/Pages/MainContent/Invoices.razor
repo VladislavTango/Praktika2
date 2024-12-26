@@ -1,0 +1,79 @@
+﻿@page "/Invoices"
+@inject IMessageService _message
+@inject ModalService _modalService
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+@using AntDesign
+
+
+
+<AntList DataSource="@InvoiceList">
+    <Card style="background-color:whitesmoke; width:100%;" Bordered Title=@("Номер Счета " + context.Id.ToString())>
+        <Body>
+            <GridRow>
+                <GridCol Flex="4" style="max-width:80%">
+                    id: @context.TransportationId
+                    <br />
+                    @if (context.Status)
+                    {
+                        <div>оплачено</div>
+                    }
+                    else
+                    {
+                        <div>не оплачено</div>
+                    }
+                    </GridCol>
+                    <GridCol Flex="1">
+                    <button style="width:100%" @onclick="() => GetInfo(context)" type="button" class="btn btn-primary">Сделать отчет</button>
+                        <br />
+                    @if(context.Status == false)
+                    {
+                        <button style="width:100%" @onclick="() => UpdateStatus(context)" type="button" class="btn btn-success">Оплатить</button>
+                    }    
+                </GridCol>
+                </GridRow>
+            </Body>
+        </Card>
+</AntList>
+
+<br />
+<Pagination PageIndex="@PageIndex" Total="50" OnChange="OnChange"></Pagination>
+
+<Modal
+       @bind-Visible="@_visible"
+       Width="600">
+    <div style="display: flex; flex-direction: column; gap: 10px; padding: 10px;">
+        <h1 style="text-align: center;">Подробная информация о счете номер @Info.InvoiceId</h1>
+        <div class = "content">
+            <span>- Номер заказа:</span>
+            <span>@Info.Order.id</span>
+        </div>
+        <div class = "content">
+            <span>- Имя заказа:</span>
+            <span>@Info.Order.orderName</span>
+        </div>
+        <div class = "content">
+            <span>- Номер перевозки:</span>
+            <span>@Info.Transportation.Id</span>
+        </div>
+        <div class = "content">
+            <span>- Дата начала доставки заказа:</span>
+            <span>@Info.Transportation.StartDate</span>
+        </div>
+        <div class = "content">
+            <span>- Дата конца доставки заказа:</span>
+            <span>@Info.Transportation.EndDate</span>
+        </div>
+        <div class = "content">
+            <span>- Дата создания заказа:</span>
+            <span>@Info.Order.createdDate</span>
+        </div>
+        <div class = "content">
+            <span>- Место прибытия:</span>
+            <span>@Info.Transportation.Road</span>
+        </div>
+        <div>
+            <p><strong>Описание груза:</strong></p>
+            <p>@Info.Order.cargoDescription</p>
+        </div>
+    </div>
+</Modal>

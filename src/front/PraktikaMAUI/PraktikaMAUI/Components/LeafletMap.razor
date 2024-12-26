@@ -1,0 +1,64 @@
+﻿<div id="map" style="height: 400px;"></div>
+
+@code {
+    private string? _endPointName;
+
+    [Parameter]
+    public string? endPointName
+    {
+        get => _endPointName;
+        set
+        {
+            if (_endPointName != value) 
+            {
+                _endPointName = value;
+                OnEndPointNameChanged(value); 
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<string?> EndPointNameChanged { get; set; }
+
+    private async Task OnEndPointNameChanged(string? newValue)
+    {
+        GetCoordinates();
+        await EndPointNameChanged.InvokeAsync(newValue);
+    }
+
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+
+    private async Task GetCoordinates()
+    {
+        string startPointName = "Минск";
+
+        string url = $"https://localhost:7012/api/Route?StartPointName={Uri.EscapeDataString(startPointName)}&EndPointName={Uri.EscapeDataString(endPointName)}";
+
+        using (HttpClient client = new HttpClient())
+        {
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+
+            HttpResponseMessage response = await client.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseData = await response.Content.ReadAsStringAsync();
+                await JSRuntime.InvokeVoidAsync("initializeMap", responseData);
+            }
+            else
+            {
+                Console.WriteLine($"Ошибка: {response.StatusCode}");
+                string errorDetails = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Детали ошибки: {errorDetails}");
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetCoordinates();
+        }
+    }
+}

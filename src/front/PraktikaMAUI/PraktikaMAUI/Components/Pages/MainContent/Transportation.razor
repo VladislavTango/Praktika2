@@ -1,0 +1,134 @@
+﻿@page "/Home/Transportation"
+@inject IMessageService _message
+@inject ModalService _modalService
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+
+
+<Button Type="primary" OnClick="@ShowModal">
+    Добавить Заказ
+</Button>
+
+    <AntList DataSource="@TranspotationList">
+        <Card style="background-color:whitesmoke; width:100%;" Bordered Title=@("Номер Доставки " + context.Id.ToString())>
+            <Body>
+                <GridRow>
+                    <GridCol Flex="4" style="max-width:80%">
+                        id заказа: @context.OrderId
+                        <br />
+                        Дата выезда : @context.StartDate
+                        <br />
+                        Дата приезда: @context.EndDate
+                        <br />
+                        Конечная точка : @context.Road
+                        <br />
+                        Статус перевозки : 
+                        @switch (context.TransportationStatus)
+                        {
+                            case 0:
+                                <span>Новый</span>
+                                break;
+                            case 1:
+                                <span>В пути</span>
+                                break;
+                            case 2:
+                                <span>Приехал</span>
+                                break;
+                            default:
+                                <span>ОШИБКА!!!!</span>
+                                break;
+                        }
+                    </GridCol>
+                    <GridCol Flex="1">
+                        <button style="width:100%" @onclick="() => DeleteTransportation(context.Id)" type="button" class="btn btn-danger">Удалить</button>
+                        <br />
+                        <button style="width:100%" @onclick="() => UpdateTransportation(context)" type="button" class="btn btn-warning">Изменить</button>
+                        <Button Type="primary" Style="width:100%;"  OnClick="@(()=>{ MapVisible = true;Route = context.Road; })">
+                            Посмотреть Маршрут
+                        </Button>
+
+                    </GridCol>
+                </GridRow>
+            </Body>
+        </Card>
+    </AntList>
+
+<br />
+
+    <Pagination PageIndex="@PageIndex" Total="50" OnChange="OnChange"></Pagination>
+
+
+<Modal Title="Map Modal" @bind-Visible="@MapVisible" Style="width:600px">
+    <LeafletMap endPointName="@Route" />
+</Modal>
+
+<Modal Title="@("Редактирование Доставки")"
+       @bind-Visible="@RedactVisible"
+       OnOk="@RedactOk"
+       OnCancel="@RedactCansel">
+
+    <Form Model="@redactModel"
+          LabelColSpan="8"
+          WrapperColSpan="16"
+          OnFinish="RedactOnFinish"
+          @ref="@redactForm"
+         >
+        <FormItem Label="Transportation ID">
+            <Input disabled="true" @bind-Value="@redactModel.Id" Rows="4" />
+        </FormItem>
+        <FormItem Label="Order Id">
+            <Input @bind-Value="@redactModel.OrderId" Rows="4" />
+        </FormItem>
+        <FormItem Label="Конечная точка">
+            <Input @bind-Value="@redactModel.Road" Rows="6" />
+        </FormItem>
+        <FormItem Label="Order Status">
+            <Switch @bind-Checked="redactModel.Status" />
+        </FormItem>
+        <FormItem Label="Дата доставки">
+            <RangePicker TValue="DateTime?[]"
+                         Value="@(GetRange(redactModel))"
+                         OnChange="@(args => SetRange(redactModel, args.Dates))">
+                <SuffixIcon>
+                    <Icon Type="calendar" Theme="twotone" />
+                </SuffixIcon>
+            </RangePicker>
+
+        </FormItem>
+        <FormItem Label="Статус доставки">
+            <Select DataSource="@list"
+                    @bind-Value="redactModel.TransportationStatus"
+                    ValueName="Value"
+                    LabelName="Name"
+                    Placeholder="Выберите статус доставки"
+                    Style="width:200px"
+                    AllowClear />
+        </FormItem>
+    </Form>
+</Modal>
+
+<Modal Title="@("Добавление Доставку")"
+       @bind-Visible="@_visible"
+       OnOk="@HandleOk"
+       OnCancel="@HandleCancel">
+    <Form Model="@model"
+          LabelColSpan="8"
+          WrapperColSpan="16"
+          OnFinish="OnFinish"
+          @ref="@_form">
+        <FormItem Label="Order Id">
+            <Input @bind-Value="@model.OrderId" Rows="4" />
+        </FormItem>
+        <FormItem Label="Конечная точка">
+            <Input @bind-Value="@model.Road" Rows="6" />
+        </FormItem>
+        <FormItem Label="Дата доставки">
+            <RangePicker TValue="DateTime?[]"
+                         Value="@(GetRange(model))"
+                         OnChange="@(args => SetRange(model, args.Dates))">
+                <SuffixIcon>
+                    <Icon Type="calendar" Theme="twotone" />
+                </SuffixIcon>
+            </RangePicker>
+        </FormItem>
+    </Form>
+</Modal>

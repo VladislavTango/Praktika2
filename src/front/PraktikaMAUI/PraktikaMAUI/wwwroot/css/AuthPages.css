@@ -1,0 +1,28 @@
+﻿h1, h4 {
+    text-align: center;
+}
+
+.forms {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+textarea {
+    resize: none;
+}
+
+.Block {
+    margin-top: 4%;
+    height: 85%;
+    padding-bottom: 5%;
+    padding-left: 5%;
+    padding-right: 5%;
+    background-color: whitesmoke;
+}
+
+.custom-password-icon {
+    color: rgba(0,0,0,.45);
+    cursor: pointer;
+    transition: all .3s;
+}

@@ -1,0 +1,76 @@
+﻿@page "/Home/Orders"
+@inject IMessageService _message
+@inject ModalService _modalService
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+@using AntDesign
+
+
+
+<Button Type="primary" OnClick="@ShowModal">
+   Добавить Заказ
+</Button>
+<AntList DataSource="@OrderList">
+        <Card style="background-color:whitesmoke; width:100%;" Bordered Title="@context.orderName">
+            <Body>
+                <GridRow>
+                    <GridCol Flex="4" style="max-width:80%">
+                        id: @context.id Дата создания: @context.createdDate
+                        <br />
+                        Описание: @context.cargoDescription
+                        <br />
+                        Статус: @context.Status
+                    </GridCol>
+                    <GridCol Flex="1">
+                        <button style="width:100%" @onclick="() => DeleteOrder(context.id)" type="button" class="btn btn-danger">Удалить</button>
+                        <br />
+                        <button style="width:100%" @onclick="() => UpdateOrder(context)" type="button" class="btn btn-warning">Изменить</button>
+                    </GridCol>
+                </GridRow>
+            </Body>
+        </Card>
+</AntList>
+<br />
+
+<Pagination PageIndex="@PageIndex" Total="50" OnChange="OnChange"></Pagination>
+
+    <Modal Title="@("Редактирование заказа")"
+       @bind-Visible="@RedactVisible"
+       OnOk="@RedactOk"
+       OnCancel="@RedactCansel">
+    <Form Model="@redactModel"
+          LabelColSpan="8"
+          WrapperColSpan="16"
+          OnFinish="RedactOnFinish"
+          @ref="@redactForm">
+        <FormItem Label="Order ID">
+            <Input disabled="true" @bind-Value="@redactModel.id" Rows="4" />
+        </FormItem>
+        <FormItem Label="Order Name">
+            <Input @bind-Value="@redactModel.orderName" Rows="4" />
+        </FormItem>
+        <FormItem Label="Описание груза">
+            <InputTextArea style="resize:none; width:100%" @bind-Value="@redactModel.cargoDescription" Rows="6" />
+        </FormItem>
+        <FormItem Label="Order Status">
+            <Switch @bind-Checked="redactModel.Status" />
+        </FormItem>
+    </Form>
+</Modal>
+
+<Modal Title="@("Добавление заказа")"
+@bind-Visible="@_visible"
+OnOk="@HandleOk"
+OnCancel="@HandleCancel">
+    <Form Model="@model"
+    LabelColSpan="8"
+    WrapperColSpan="16"
+    OnFinish="OnFinish"
+    @ref="@_form">
+        <FormItem Label="Order Name">
+            <Input @bind-Value="@model.OrderName" Rows="4" />
+        </FormItem>
+        <FormItem Label="Описание текста">
+            <InputTextArea style="resize:none; width:100%" @bind-Value="@model.CargoDescription" Rows="6" />
+        </FormItem>
+    </Form>
+</Modal>

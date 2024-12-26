@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+@using AntDesign
+
+@if (value == null)
+{
+    <div>
+    @Body
+    </div>
+}
+else
+{
+        <div>
+            <Header>
+                <div class="logo" />
+                <Menu Theme="MenuTheme.Dark" Mode="MenuMode.Horizontal">
+                    <MenuItem Key="1"><NavLink href="Home/Orders">Order</NavLink></MenuItem>
+                    <MenuItem Key="2"><NavLink href="Home/Transportation">Transportation</NavLink></MenuItem>
+                    <MenuItem Key="3"><NavLink href="Home/Contracts">Contracts</NavLink></MenuItem>
+                    <MenuItem Key="4"><NavLink href="Invoices">Invoices</NavLink></MenuItem>
+                </Menu>
+            </Header>
+
+            <Content Style="padding: 0 50px;">
+                <div class="site-layout-content">
+                    @Body
+                </div>
+            </Content>
+        </div>
+}

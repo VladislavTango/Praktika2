@@ -1,0 +1,75 @@
+﻿@page "/Home/Contracts" 
+@inject IMessageService _message 
+@inject ModalService _modalService 
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+
+@using AntDesign
+
+
+<Button Type="primary" OnClick="@ShowModal"> 
+     Добавить Заказ 
+ </Button>
+<AntList DataSource="@ContractList">
+    <Card style="background-color:whitesmoke; width:100%;" Bordered Title=@("Номер контракта " + context.Id.ToString()) > 
+         <Body> 
+             <GridRow> 
+                 <GridCol Flex="4" style="max-width:80%"> 
+                     id заказа: @context.OrderId
+                     <br /> 
+                     Описание: @context.ContractTerms 
+                     <br /> 
+                     Статус: @context.Status 
+                 </GridCol> 
+                 <GridCol Flex="1"> 
+                     <button style="width:100%" @onclick="() => DeleteContract(context.Id)" type="button" class="btn btn-danger">Удалить</button> 
+                     <br />
+                    <button style="width:100%" @onclick="() => UpdateContract(context)" type="button" class="btn btn-warning">Изменить</button>
+                </GridCol> 
+             </GridRow> 
+         </Body> 
+     </Card> 
+ </AntList> 
+
+ <Pagination PageIndex="@PageIndex" Total="50" OnChange="OnChange"></Pagination> 
+
+ <Modal Title="@("Редактирование Контракт")" 
+        @bind-Visible="@RedactVisible" 
+        OnOk="@RedactOk" 
+        OnCancel="@RedactCansel"> 
+     <Form Model="@redactModel" 
+           LabelColSpan="8" 
+           WrapperColSpan="16" 
+           OnFinish="RedactOnFinish" 
+           @ref="@redactForm"> 
+         <FormItem Label="Contract ID"> 
+             <Input disabled="true" @bind-Value="@redactModel.Id" Rows="4" /> 
+         </FormItem> 
+         <FormItem Label="Order Id"> 
+             <Input @bind-Value="@redactModel.OrderId" Rows="4" /> 
+         </FormItem> 
+         <FormItem Label="Условия договора"> 
+             <InputTextArea style="resize:none; width:100%" @bind-Value="@redactModel.ContractTerms" Rows="6" /> 
+         </FormItem> 
+         <FormItem Label="Order Status"> 
+             <Switch @bind-Checked="redactModel.Status" /> 
+         </FormItem> 
+     </Form> 
+ </Modal> 
+
+ <Modal Title="@("Добавление заказа")" 
+        @bind-Visible="@_visible" 
+        OnOk="@HandleOk" 
+        OnCancel="@HandleCancel"> 
+     <Form Model="@model" 
+           LabelColSpan="8" 
+           WrapperColSpan="16" 
+           OnFinish="OnFinish" 
+           @ref="@_form"> 
+         <FormItem Label="Order Id"> 
+             <Input @bind-Value="@model.OrderId" Rows="4" /> 
+         </FormItem> 
+         <FormItem Label="Условия договора"> 
+             <InputTextArea style="resize:none; width:100%" @bind-Value="@model.ContractTerms" Rows="6" /> 
+         </FormItem> 
+     </Form> 
+ </Modal>

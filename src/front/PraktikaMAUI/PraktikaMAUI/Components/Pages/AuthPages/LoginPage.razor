@@ -1,0 +1,49 @@
+﻿@page "/Login"
+@using AntDesign
+@inject IMessageService _message
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService _localStoragee
+<link href="css/AuthPages.css" rel="stylesheet" />
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+        </div>
+        <div class="col-6 Block">
+            <h1>Логин</h1>
+            <div class="forms">
+                <Space Direction="@DirectionVHType.Vertical">
+                    <SpaceItem>
+                        <Input Placeholder="Имя пользователя" Size="@InputSize.Large" @bind-Value="@UserName">
+                        <Prefix>
+                            <Icon Type="user" />
+                        </Prefix>
+                        </Input>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <InputPassword @bind-Value="@Password" Placeholder="Пароль" Size="@InputSize.Large" />
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Input @bind-Value="@UserEmail" Placeholder="Email" Size="@InputSize.Large" />
+                    </SpaceItem>
+                    <Button Type="@ButtonType.Primary"
+                            AutoLoading
+                            OnClick="EnterNoIconLoading">
+                        Войти
+                    </Button>
+                    <br>
+                    <Link><a href="/"><h4>Зарегистрироваться</h4></a></Link>
+
+                </Space>
+            </div>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+</div>
+
+@code {
+    RenderFragment actionSetting(Func<Task> clickActionAsync, Dictionary<string, object> iconAttributes) =>
+    @<Icon @attributes="@iconAttributes" OnClick="@clickActionAsync" />;
+}
