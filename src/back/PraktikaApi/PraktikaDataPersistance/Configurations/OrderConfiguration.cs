@@ -6,11 +6,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
     {
+        builder.HasKey(o => o.Id);
 
-        builder.HasKey(x => x.Id);
-
-        builder.HasOne(x => x.Client)
-            .WithMany(x => x.OrderList)
-            .HasForeignKey(x => x.ClientId);
+        builder.HasOne(o => o.Client)
+            .WithMany()
+            .HasForeignKey(o => o.ClientId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

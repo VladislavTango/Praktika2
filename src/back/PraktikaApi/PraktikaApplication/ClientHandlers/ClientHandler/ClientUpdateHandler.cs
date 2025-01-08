@@ -29,8 +29,6 @@ namespace PraktikaApplication.ClientHandlers.ClientHandler
 
             _mapper.Map(request, existingClient);
 
-            existingClient.Contacts = ContactsToDict.DictToString(request.Contacts);
-
             existingClient.Status = request.Status;
 
             _context.Clients.Update(existingClient);

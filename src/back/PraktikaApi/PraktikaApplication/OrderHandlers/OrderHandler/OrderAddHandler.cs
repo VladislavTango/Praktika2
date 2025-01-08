@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PraktikaApplication.OrderHandlers.OrderCommand;
 using PraktikaDataPersistance.ApplicationContext;
 using PraktikaDomain.Entities;
+using PraktikaDomain.Enums;
 using PraktikaDomain.Interfaces;
 
 namespace PraktikaApplication.OrderHandlers.OrderHandler
@@ -34,13 +35,41 @@ namespace PraktikaApplication.OrderHandlers.OrderHandler
             if (await _context.Clients.FirstOrDefaultAsync(x => x.Id == Claims.userId) == null)
                 throw new Exception("Client not found");
 
+            var contract = await _context.Contracts
+            .FirstOrDefaultAsync(c => c.Id == request.ContractId);
+
+            if (contract == null || contract.Status == false)
+            {
+                throw new Exception("Contract not found or closed");
+            }
+
+            if (request.CreatedDate < contract.ContractDate ||
+            (contract.ExpirationDate != null && request.CreatedDate > contract.ExpirationDate))
+            {
+                throw new Exception("Invalid date");
+            }
+
+            if(contract.ContractType == ContractType.ONCE && 
+                (await _context.Orders
+                .Where(o => o.ContractList
+                .Any())
+                .AnyAsync(o => o.ContractList
+                .Any(c => c.ContractType == ContractType.ONCE && c.Id == contract.Id))))
+            {
+                throw new Exception("you can't create order with this contract");
+            }
+
             var order = _mapper.Map<Order>(request);
             order.ClientId = Claims.userId;
             order.CreatedDate = DateTime.UtcNow;
             order.Status = true;
-
+            order.OrderNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6)}";
             _context.Orders.Add(order);
+
             await _context.SaveChangesAsync();
+            contract.OrderId = order.Id;
+            await _context.SaveChangesAsync();
+
 
             return order.Id;
         }

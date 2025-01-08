@@ -10,28 +10,28 @@ namespace PraktikaApi.Controllers
     {
         [Authorize]
         [HttpGet]
-        public IActionResult GetClients([FromQuery] ContractGetListCommand command)
+        public IActionResult GetContracts([FromQuery] ContractGetListCommand command)
         {
             var responce = Mediator.Send(command);
             return Ok(responce);
         }
         [Authorize]
         [HttpPut]
-        public IActionResult UpdateClients([FromBody] ContractUpdateCommand command)
+        public IActionResult UpdateContracts([FromBody] ContractUpdateCommand command)
         {
             var responce = Mediator.Send(command);
             return Ok(responce);
         }
         [Authorize]
         [HttpDelete]
-        public IActionResult DeleteClient([FromBody] ContractDeleteCommand command)
+        public IActionResult DeleteContract([FromBody] ContractDeleteCommand command)
         {
             var responce = Mediator.Send(command);
             return Ok(responce);
         }
         [Authorize]
         [HttpPost]
-        public IActionResult AddCliebts([FromBody] ContractAddCommand command)
+        public IActionResult AddContract([FromBody] ContractAddCommand command)
         {
             var responce = Mediator.Send(command);
             return Ok(responce);

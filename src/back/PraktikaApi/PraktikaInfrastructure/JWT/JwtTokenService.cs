@@ -41,14 +41,12 @@ namespace PraktikaInfrastructure.JWT
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
 
-            // Извлекаем клеймы
             var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (emailClaim == null || userIdClaim == null)
                 throw new Exception("Не удалось извлечь клеймы из токена.");
 
-            // Преобразуем userId из строки в int
             if (!int.TryParse(userIdClaim, out int userId))
                 throw new Exception("Неверный формат userId в токене.");
 

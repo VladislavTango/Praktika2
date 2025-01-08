@@ -8,12 +8,16 @@ namespace PraktikaDataPersistance.Configurations
     {
         public void Configure(EntityTypeBuilder<Contract> builder)
         {
-            builder.HasKey(x => x.Id);
+            builder.HasKey(c => c.Id);
 
-            builder.HasOne(x => x.Order)
-            .WithMany(x => x.ContractList)  
-            .HasForeignKey(x => x.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);   
+            builder.Property(c => c.ContractType)
+                .HasConversion<string>()
+                .IsRequired();
+
+            builder.HasOne(c => c.Order)
+                .WithMany(o => o.ContractList)
+                .HasForeignKey(c => c.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

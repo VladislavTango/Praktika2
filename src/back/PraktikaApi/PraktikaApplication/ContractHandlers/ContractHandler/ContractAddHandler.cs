@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
-using CommonShared.Domains;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using PraktikaApplication.ContractHandlers.ContractHandler;
 using PraktikaDataPersistance.ApplicationContext;
 using PraktikaDomain.Entities;
+using PraktikaDomain.Interfaces;
 
 namespace PraktikaApplication.ContractHandlers.ContractCommand
 {
@@ -12,16 +13,30 @@ namespace PraktikaApplication.ContractHandlers.ContractCommand
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public ContractAddHandler(AppDbContext context , IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IJwtTokentService _jwtTokentService;
+
+        public ContractAddHandler(AppDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor, IJwtTokentService jwtTokentService)
         {
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+            _jwtTokentService = jwtTokentService;
         }
 
         public async Task<int> Handle(ContractAddCommand request, CancellationToken cancellationToken)
         {
-            if (await _context.Orders.FirstOrDefaultAsync(x=> x.Id == request.OrderId) == null)
-                throw new Exception("Order not found");
+            var httpContext = _httpContextAccessor.HttpContext;
+            var authorizationHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault().Split(" ")[1];
+
+            var Claims = _jwtTokentService.TokenClaimCatcher(authorizationHeader);
+
+            if (!(await _context.Clients.FirstOrDefaultAsync(x => x.Id == Claims.userId)).Status)
+                throw new Exception("Incorrect client status");
+
+            if(request.ExpirationDate<request.ContractDate)
+                throw new Exception("Contract unreal");
+
 
             var contract = _mapper.Map<Contract>(request);
 

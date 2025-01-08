@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using PraktikaDomain.Enums;
 
 namespace PraktikaApplication.OrderHandlers.OrderCommand
 {
@@ -8,5 +9,6 @@ namespace PraktikaApplication.OrderHandlers.OrderCommand
         public string OrderName { get; set; }
         public bool Status { get; set; }
         public string CargoDescription { get; set; }
+        public CargoType CargoType { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using PraktikaMAUI.Models;
 using PraktikaMAUI.Components.Interface;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
-using PraktikaMAUI.Models.Enum;
+using System.ComponentModel;
 
 namespace PraktikaMAUI.Components.Pages.MainContent
 {
@@ -33,12 +33,20 @@ namespace PraktikaMAUI.Components.Pages.MainContent
 
         private TransportationModel redactModel = new TransportationModel();
         private AddTransportation model = new AddTransportation();
+        private List<SelectModels> VehiclesList = new List<SelectModels>();
 
-        private List<SelectModels> list = new List<SelectModels>
+        private List<SelectModels> Statuslist = new List<SelectModels>
         {
             new SelectModels {Value = 0 , Name = "Новый"},
             new SelectModels {Value = 1 , Name = "В пути"},
             new SelectModels {Value = 2, Name = "Приехал"},
+        };
+        private List<SelectModels> CargoList = new List<SelectModels>
+        {
+            new SelectModels {Value = 0 , Name = "Стандарт"},
+            new SelectModels {Value = 1 , Name = "Опасный"},
+            new SelectModels {Value = 2, Name = "Большой"},
+            new SelectModels {Value = 3, Name = "Жидкий"},
         };
 
         private string token {  get; set; }
@@ -130,12 +138,14 @@ namespace PraktikaMAUI.Components.Pages.MainContent
             redactModel = new()
             {
                 Id = TransportationModel.Id,
-                OrderId = TransportationModel.OrderId,
+                OrderNumber = TransportationModel.OrderNumber,
                 Status = TransportationModel.Status,
                 StartDate = TransportationModel.StartDate,
                 EndDate = TransportationModel.EndDate,
                 Road = TransportationModel.Road,
                 TransportationStatus = TransportationModel.TransportationStatus,
+                cargoType = TransportationModel.cargoType,
+                VehicleId = TransportationModel.VehicleId,
             };
             RedactVisible = true;
         }
@@ -148,14 +158,70 @@ namespace PraktikaMAUI.Components.Pages.MainContent
         }
         protected override async Task OnInitializedAsync()
         {
+            await GetVehiclesByCargo(model , null);
+            model.PropertyChanged += CargoPropertyChanged;
+            redactModel.PropertyChanged += CargoPropertyChanged;
             token = (await _localStorage.GetItemAsStringAsync("Token")).Trim('\"');
             await GetTransportations();
         }
+        private async void CargoPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(model.cargoType))
+            {
+                await GetVehiclesByCargo(model,null);
+            }
+            if (e.PropertyName == nameof(redactModel.cargoType)) 
+            {
+                await GetVehiclesByCargo(null , redactModel);
+            }
+        }
 
+        private async Task GetVehiclesByCargo(AddTransportation? addModel , TransportationModel redact) 
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://localhost:7012");
+
+                client.DefaultRequestHeaders.Add("Accept", "*/*");
+
+                dynamic obj = addModel == null ? redact : addModel;
+                HttpResponseMessage response = await client.GetAsync($"/api/Vehicle/by_cargo?CargoType={obj.cargoType}");
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    VehiclesList.Clear();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var jsonDoc = JsonDocument.Parse(responseBody);
+
+
+                    if (jsonDoc.RootElement.TryGetProperty("response", out JsonElement responseElement))
+                    {
+                        foreach (var item in responseElement.EnumerateArray())
+                        {
+                            if (item.ValueKind == JsonValueKind.Number && item.TryGetInt32(out int number))
+                            {
+                                VehiclesList.Add(new SelectModels()
+                                {
+                                    Value = number,
+                                    Name = number.ToString()
+                                });
+                            }
+                        }
+                    }
+                    StateHasChanged();
+                }
+                else
+                {
+                    string errorStr = await ResponseErrorCatcher.ErrorCatcher(response);
+                    Error(errorStr);
+                }
+            }
+        }
         private async Task HandleOk(MouseEventArgs e)
         {
             _submitting = true;
-            if (model.StartDate == null || model.EndDate == null || model.OrderId == null || model.Road == null)
+            if (model.StartDate == null || model.EndDate == null || model.OrderNumber == null || model.Road == null)
             {
                 Error("не все поля заполненны");
                 return;
@@ -164,10 +230,12 @@ namespace PraktikaMAUI.Components.Pages.MainContent
 
             var requestData = new
             {
-                orderId = model.OrderId,
+                orderNumber = model.OrderNumber,
+                vehicleId = model.vehicleId,
                 startDate = model.StartDate,
                 endDate = model.EndDate,
                 road = model.Road,
+                cargoType = model.cargoType
             };
 
             var jsonContent = JsonSerializer.Serialize(requestData);
@@ -201,10 +269,12 @@ namespace PraktikaMAUI.Components.Pages.MainContent
             {
                 id = redactModel.Id,
                 Status = redactModel.Status,
-                OrderId = redactModel.OrderId,
+                orderNumber = redactModel.OrderNumber,
                 startDate = redactModel.StartDate,
                 endDate = redactModel.EndDate,
                 road = redactModel.Road,
+                cargoType = redactModel.cargoType,
+                vehicleId = redactModel.VehicleId,
                 transportationStatus = redactModel.TransportationStatus,
             };
 

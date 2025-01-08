@@ -13,7 +13,7 @@
             <Body>
                 <GridRow>
                     <GridCol Flex="4" style="max-width:80%">
-                        id заказа: @context.OrderId
+                        Номер заказа: @context.OrderNumber
                         <br />
                         Дата выезда : @context.StartDate
                         <br />
@@ -37,6 +37,26 @@
                                 <span>ОШИБКА!!!!</span>
                                 break;
                         }
+                        <br />
+                        Тип груза:
+                    @switch (context.cargoType)
+                    {
+                        case 0:
+                            <span>Стандарт</span>
+                            break;
+                        case 1:
+                            <span>Опасный</span>
+                            break;
+                        case 2:
+                            <span>Большой</span>
+                            break;
+                        case 3:
+                            <span>Жидкий</span>
+                            break;
+                        default:
+                            <span>ОШИБКА!!!!</span>
+                            break;
+                    }
                     </GridCol>
                     <GridCol Flex="1">
                         <button style="width:100%" @onclick="() => DeleteTransportation(context.Id)" type="button" class="btn btn-danger">Удалить</button>
@@ -75,8 +95,8 @@
         <FormItem Label="Transportation ID">
             <Input disabled="true" @bind-Value="@redactModel.Id" Rows="4" />
         </FormItem>
-        <FormItem Label="Order Id">
-            <Input @bind-Value="@redactModel.OrderId" Rows="4" />
+        <FormItem Label="Номер заказа">
+            <Input @bind-Value="@redactModel.OrderNumber" Rows="4" />
         </FormItem>
         <FormItem Label="Конечная точка">
             <Input @bind-Value="@redactModel.Road" Rows="6" />
@@ -95,11 +115,29 @@
 
         </FormItem>
         <FormItem Label="Статус доставки">
-            <Select DataSource="@list"
+            <Select DataSource="@Statuslist"
                     @bind-Value="redactModel.TransportationStatus"
                     ValueName="Value"
                     LabelName="Name"
                     Placeholder="Выберите статус доставки"
+                    Style="width:200px"
+                    AllowClear />
+        </FormItem>
+        <FormItem Label="Тип груза">
+            <Select DataSource="@CargoList"
+                    @bind-Value="redactModel.cargoType"
+                    ValueName="Value"
+                    LabelName="Name"
+                    Placeholder="Тип груза"
+                    Style="width:200px"
+                    AllowClear />
+        </FormItem>
+        <FormItem Label="Машины для доставки">
+            <Select DataSource="@VehiclesList"
+                    @bind-Value="redactModel.VehicleId"
+                    ValueName="Value"
+                    LabelName="Name"
+                    Placeholder="Тип груза"
                     Style="width:200px"
                     AllowClear />
         </FormItem>
@@ -115,8 +153,8 @@
           WrapperColSpan="16"
           OnFinish="OnFinish"
           @ref="@_form">
-        <FormItem Label="Order Id">
-            <Input @bind-Value="@model.OrderId" Rows="4" />
+        <FormItem Label="Order Number">
+            <Input @bind-Value="@model.OrderNumber" Rows="4" />
         </FormItem>
         <FormItem Label="Конечная точка">
             <Input @bind-Value="@model.Road" Rows="6" />
@@ -129,6 +167,24 @@
                     <Icon Type="calendar" Theme="twotone" />
                 </SuffixIcon>
             </RangePicker>
+        </FormItem>
+        <FormItem Label="Тип груза">
+            <Select DataSource="@CargoList"
+                    @bind-Value="model.cargoType"
+                    ValueName="Value"
+                    LabelName="Name"
+                    Placeholder="Тип груза"
+                    Style="width:200px"
+                    AllowClear />
+        </FormItem>
+        <FormItem Label="Машины для доставки">
+            <Select DataSource="@VehiclesList"
+                    @bind-Value="model.vehicleId"
+                    ValueName="Value"
+                    LabelName="Name"
+                    Placeholder="Тип груза"
+                    Style="width:200px"
+                    AllowClear />
         </FormItem>
     </Form>
 </Modal>

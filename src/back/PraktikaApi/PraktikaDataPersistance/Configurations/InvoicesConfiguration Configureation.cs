@@ -4,12 +4,10 @@ using PraktikaDomain.Entities;
 
 namespace PraktikaDataPersistance.Configurations
 {
-    public class InovicesConfigureation : IEntityTypeConfiguration<Invoices>
+    public class InvoicesConfiguration : IEntityTypeConfiguration<Invoices>
     {
         public void Configure(EntityTypeBuilder<Invoices> builder)
         {
-            builder.ToTable("Invoices");
-
             builder.HasKey(i => i.Id);
 
             builder.HasOne(i => i.Transportation)

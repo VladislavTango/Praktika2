@@ -8,21 +8,25 @@ namespace PraktikaDataPersistance.Configurations
     {
         public void Configure(EntityTypeBuilder<Transportation> builder)
         {
-            builder.HasKey(x => x.Id);
+            builder.HasKey(t => t.Id);
+
+            builder.Property(o => o.CargoType)
+                .HasConversion<string>()
+                .IsRequired();
 
             builder.Property(t => t.TransportationStatus)
-               .HasConversion<string>() 
-               .IsRequired();
+                .HasConversion<string>()
+                .IsRequired();
 
-            //builder.HasOne(x => x.Order)
-            // .WithOne()
-            // .HasForeignKey<Transportation>(x => x.OrderId)
-            // .OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(t => t.Order)
+                .WithMany(o => o.TransportationList)
+                .HasForeignKey(t => t.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            //builder.HasMany(x => x.Cargos)
-            //    .WithOne(x => x.Transportation)
-            //    .HasForeignKey(x => x.TransportationId)
-            //    .OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(t => t.Vehicle)
+                .WithMany()
+                .HasForeignKey(t => t.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

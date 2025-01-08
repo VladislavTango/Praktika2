@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenIddict.EntityFrameworkCore.Models;
 using PraktikaDomain.Entities;
+using PraktikaDomain.Entities.TransportEntities;
 
 namespace PraktikaDataPersistance.ApplicationContext
 {
@@ -12,10 +13,10 @@ namespace PraktikaDataPersistance.ApplicationContext
         public DbSet<Transportation> Transportations { get; set; } = null;
         public DbSet<Cargo> Cargos { get; set; } = null;
         public DbSet<Invoices> Inovices { get; set; } = null;
-        //public DbSet<OpenIddictEntityFrameworkCoreApplication> Applications { get; set; }
-        //public DbSet<OpenIddictEntityFrameworkCoreAuthorization> Authorizations { get; set; }
-        //public DbSet<OpenIddictEntityFrameworkCoreScope> Scopes { get; set; }
-        //public DbSet<OpenIddictEntityFrameworkCoreToken> Tokens { get; set; }
+        public DbSet<Trailer> Trailers { get; set; } = null;
+        public DbSet<Truck> Trucks { get; set; } = null;
+        public DbSet<Vehicle> Vehicles { get; set; } = null;
+        public DbSet<CargoTrailerCompatibility> cargoTrailerCompatibilities { get; set; } = null;
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
            : base(options)

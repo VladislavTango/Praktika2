@@ -1,4 +1,6 @@
-﻿namespace PraktikaMAUI.Models
+﻿using PraktikaMAUI.Models.Enum;
+
+namespace PraktikaMAUI.Models
 {
     public class OrderModel
     {
@@ -7,5 +9,6 @@
         public DateTime createdDate { get; set; }
         public int id { get; set; }
         public bool Status { get; set; }
+        public string orderNumber { get; set; }
     }
 }

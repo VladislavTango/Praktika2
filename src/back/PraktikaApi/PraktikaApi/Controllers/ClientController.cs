@@ -40,7 +40,7 @@ namespace PraktikaApi.Controllers
             return Ok(responce);
         }
         [HttpPost("confirm code")]
-        public IActionResult ConfirmCodeClients([FromBody] ClientSendCodeCommand command)
+        public IActionResult SendCode([FromBody] ClientSendCodeCommand command)
         {
             var responce = Mediator.Send(command);
             return Ok(responce);

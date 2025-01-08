@@ -1,8 +1,13 @@
-﻿namespace PraktikaMAUI.Models.ModalModels
+﻿using PraktikaMAUI.Components.Interface;
+using PraktikaMAUI.Models.Enum;
+
+namespace PraktikaMAUI.Models.ModalModels
 {
-    public class AddContract
+    public class AddContract : IHasDateRange
     {
-        public int OrderId { get; set; }
-        public string ContractTerms { get; set; }
+        public string contractTerms { get; set; }
+        public ContractType contractType { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

@@ -30,6 +30,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PraktikaDataPersistance", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{B76CCECB-986F-4EE1-B78A-B854B6636D02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{8864342D-33D4-429B-B2FC-AC30A97CFEA5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B76CCECB-986F-4EE1-B78A-B854B6636D02} = {B76CCECB-986F-4EE1-B78A-B854B6636D02}
+		{DD0552A2-C36D-4A63-83F2-40413615188B} = {DD0552A2-C36D-4A63-83F2-40413615188B}
+		{E7B37C2E-ADB0-448C-BB5D-AA62CFA077E3} = {E7B37C2E-ADB0-448C-BB5D-AA62CFA077E3}
+		{F163BA5E-A2BB-4ADE-A6E4-25ECDD1A9DCB} = {F163BA5E-A2BB-4ADE-A6E4-25ECDD1A9DCB}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +68,10 @@ Global
 		{B76CCECB-986F-4EE1-B78A-B854B6636D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B76CCECB-986F-4EE1-B78A-B854B6636D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B76CCECB-986F-4EE1-B78A-B854B6636D02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8864342D-33D4-429B-B2FC-AC30A97CFEA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8864342D-33D4-429B-B2FC-AC30A97CFEA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8864342D-33D4-429B-B2FC-AC30A97CFEA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8864342D-33D4-429B-B2FC-AC30A97CFEA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

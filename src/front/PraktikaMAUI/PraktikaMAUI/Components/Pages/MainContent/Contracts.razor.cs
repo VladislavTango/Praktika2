@@ -5,6 +5,7 @@ using System.Text.Json;
 using PraktikaMAUI.Models.ModalModels;
 using System.Text;
 using PraktikaMAUI.Models;
+using PraktikaMAUI.Components.Interface;
 
 namespace PraktikaMAUI.Components.Pages.MainContent
 {
@@ -26,12 +27,34 @@ namespace PraktikaMAUI.Components.Pages.MainContent
         private ContractModel redactModel = new ContractModel();
         private AddContract model = new AddContract();
 
+        private List<SelectModels> list = new List<SelectModels>
+        {
+            new SelectModels {Value = 0 , Name = "Разовый"},
+            new SelectModels {Value = 1 , Name = "Долгосрочный"},
+        };
+
         private string token {  get; set; }
+
+        private DateTime?[] GetRange<T>(T model) where T : IHasDateRange
+        {
+            return new DateTime?[] { model.StartDate, model.EndDate };
+        }
+
+        private void SetRange<T>(T model, DateTime?[] value) where T : IHasDateRange
+        {
+            if (value is { Length: 2 })
+            {
+                model.StartDate = value[0];
+                model.EndDate = value[1];
+            }
+        }
+
 
         private void ShowModal()
         {
             _visible = true;
         }
+
 
         private async Task GetContracts()
         {
@@ -98,9 +121,9 @@ namespace PraktikaMAUI.Components.Pages.MainContent
             redactModel = new()
             {
                 Id = contractModel.Id,
-                OrderId = contractModel.OrderId,
                 Status = contractModel.Status,
-                ContractTerms = contractModel.ContractTerms
+                ContractTerms = contractModel.ContractTerms,
+                ContractType = contractModel.ContractType
             };
             RedactVisible = true;
         }
@@ -120,7 +143,7 @@ namespace PraktikaMAUI.Components.Pages.MainContent
         private async Task HandleOk(MouseEventArgs e)
         {
             _submitting = true;
-            if (model.ContractTerms == null || model.OrderId == null)
+            if (model.contractTerms == null)
             {
                 Error("не все поля заполненны");
                 return;
@@ -129,8 +152,10 @@ namespace PraktikaMAUI.Components.Pages.MainContent
 
             var requestData = new
             {
-                orderId = model.OrderId,
-                contractTerms = model.ContractTerms
+                contractTerms = model.contractTerms,
+                contractType = model.contractType,
+                contractDate = model.StartDate,
+                expirationDate = model.EndDate
             };
 
             var jsonContent = JsonSerializer.Serialize(requestData);

@@ -10,7 +10,7 @@ namespace PraktikaMAUI.Components
             var document = JsonDocument.Parse(errorResponse);
 
             document.RootElement.TryGetProperty("Response", out JsonElement responseElement);
-            responseElement.TryGetProperty("ErrorStr", out JsonElement errorStrElement);
+            responseElement.TryGetProperty("ErrorMessage", out JsonElement errorStrElement);
 
             string errorStr = errorStrElement.GetString();
 

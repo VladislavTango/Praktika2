@@ -14,8 +14,12 @@
          <Body> 
              <GridRow> 
                  <GridCol Flex="4" style="max-width:80%"> 
-                     id заказа: @context.OrderId
-                     <br /> 
+                     Тип контракта : @context.ContractType
+                     <br />
+                     Дата начала : @context.ContractDate
+                    <br />
+                     Дата конца : @context.ExpirationDate
+                    <br />
                      Описание: @context.ContractTerms 
                      <br /> 
                      Статус: @context.Status 
@@ -44,19 +48,25 @@
          <FormItem Label="Contract ID"> 
              <Input disabled="true" @bind-Value="@redactModel.Id" Rows="4" /> 
          </FormItem> 
-         <FormItem Label="Order Id"> 
-             <Input @bind-Value="@redactModel.OrderId" Rows="4" /> 
-         </FormItem> 
          <FormItem Label="Условия договора"> 
              <InputTextArea style="resize:none; width:100%" @bind-Value="@redactModel.ContractTerms" Rows="6" /> 
          </FormItem> 
          <FormItem Label="Order Status"> 
              <Switch @bind-Checked="redactModel.Status" /> 
-         </FormItem> 
+         </FormItem>
+        <FormItem Label="Тип договора">
+            <Select DataSource="@list"
+                    @bind-Value="redactModel.ContractType"
+                    ValueName="Value"
+                    LabelName="Name"
+                    Placeholder="Тип договора"
+                    Style="width:200px"
+                    AllowClear />
+        </FormItem>
      </Form> 
  </Modal> 
 
- <Modal Title="@("Добавление заказа")" 
+ <Modal Title="@("Добавление контракта")" 
         @bind-Visible="@_visible" 
         OnOk="@HandleOk" 
         OnCancel="@HandleCancel"> 
@@ -65,11 +75,27 @@
            WrapperColSpan="16" 
            OnFinish="OnFinish" 
            @ref="@_form"> 
-         <FormItem Label="Order Id"> 
-             <Input @bind-Value="@model.OrderId" Rows="4" /> 
-         </FormItem> 
          <FormItem Label="Условия договора"> 
-             <InputTextArea style="resize:none; width:100%" @bind-Value="@model.ContractTerms" Rows="6" /> 
-         </FormItem> 
+             <InputTextArea style="resize:none; width:100%" @bind-Value="@model.contractTerms" Rows="6" /> 
+         </FormItem>
+        <FormItem Label="Время действия контракта">
+            <RangePicker TValue="DateTime?[]"
+                         Value="@(GetRange(model))"
+                         OnChange="@(args => SetRange(model, args.Dates))">
+                <SuffixIcon>
+                    <Icon Type="calendar" Theme="twotone" />
+                </SuffixIcon>
+            </RangePicker>
+
+        </FormItem>
+        <FormItem Label="Тип договора">
+            <Select DataSource="@list"
+                    @bind-Value="model.contractType"
+                    ValueName="Value"
+                    LabelName="Name"
+                    Placeholder="Тип договора"
+                    Style="width:200px"
+                    AllowClear />
+        </FormItem>
      </Form> 
  </Modal>

@@ -2,10 +2,12 @@
 using CommonShared.Domains;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using PraktikaApplication.TransportationHandlers.TransportationCommand;
 using PraktikaDataPersistance.ApplicationContext;
-using PraktikaDomain;
 using PraktikaDomain.Entities;
+using PraktikaDomain.Entities.TransportEntities;
+using PraktikaDomain.Enums;
 using PraktikaDomain.Interfaces;
 using System.Diagnostics;
 
@@ -31,40 +33,60 @@ namespace PraktikaApplication.TransportationHandlers.TransportationHandler
         public async Task Handle(TransportationUpdateCommand request, CancellationToken cancellationToken)
         {
             var httpContext = _httpContextAccessor.HttpContext;
-            var authorizationHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault().Split(" ")[1];
+            var authorizationHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ")[1];
 
-            var Claims = _jwtTokentService.TokenClaimCatcher(authorizationHeader);
+            var claims = _jwtTokentService.TokenClaimCatcher(authorizationHeader);
 
-            var transportation = _context.Transportations.FirstOrDefault(x => x.Id == request.Id);
+            var transportation = await _context.Transportations.FirstOrDefaultAsync(x => x.Id == request.Id);
 
             if (transportation == null)
                 throw new Exception("Transportation not found");
 
-            if(transportation.TransportationStatus != request.TransportationStatus) 
+            var vehicle = await _context.Vehicles
+                .Include(x => x.Truck)
+                .Include(x => x.Trailer)
+                .FirstOrDefaultAsync(x => x.Id == request.VehicleId);
+
+            if (vehicle == null)
+                throw new Exception("Vehicle not found");
+
+            var isCompatible = await _context.cargoTrailerCompatibilities
+                .AnyAsync(x => x.CargoType == request.CargoType && x.TrailerType == vehicle.Trailer.TrailerType);
+
+            if (!isCompatible)
+                throw new Exception("The types do not match");
+
+            var order = await _context.Orders.FirstOrDefaultAsync(x => x.OrderNumber == request.OrderNumber);
+
+            if (order == null)
+                throw new Exception("Order not found");
+
+            transportation.OrderId = order.Id;
+
+            if (transportation.TransportationStatus != request.TransportationStatus)
             {
-                 await _emailService.SendTransportationStatus
-                    (request.TransportationStatus.ToString() , Claims.userEmail);
-                if (request.TransportationStatus == PraktikaDomain.TransportationStatus.READY)
+                await _emailService.SendTransportationStatus(request.TransportationStatus.ToString(), claims.userEmail);
+
+                if (request.TransportationStatus == TransportationStatus.READY)
                 {
-                    var Invoice = new Invoices()
+                    var invoice = new Invoices
                     {
                         TransportationId = request.Id,
                         Status = false
                     };
-                    _context.Inovices.Add(Invoice);
+                    _context.Inovices.Add(invoice);
                 }
-                else 
+                else
                 {
-                    var Invoice =_context.Inovices.FirstOrDefault(x => x.TransportationId == transportation.Id);
-                    if(Invoice != null)
-                        _context.Inovices.Remove(Invoice);
+                    var invoice = await _context.Inovices.FirstOrDefaultAsync(x => x.TransportationId == transportation.Id);
+                    if (invoice != null)
+                        _context.Inovices.Remove(invoice);
                 }
             }
 
-
             _mapper.Map(request, transportation);
-
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
+
     }
 }

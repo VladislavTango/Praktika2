@@ -9,7 +9,7 @@ namespace PraktikaApi.Controllers
     {
         [Authorize]
         [HttpGet]
-        public IActionResult GetClients([FromQuery] OrderGetListCommand command)
+        public IActionResult GetOrders([FromQuery] OrderGetListCommand command)
         {
             var responce = Mediator.Send(command);
             return Ok(responce);

@@ -14,11 +14,13 @@
             <Body>
                 <GridRow>
                     <GridCol Flex="4" style="max-width:80%">
-                        id: @context.id Дата создания: @context.createdDate
-                        <br />
-                        Описание: @context.cargoDescription
-                        <br />
-                        Статус: @context.Status
+                    Номер: @context.orderNumber
+                    <br />
+                    Дата создания: @context.createdDate
+                    <br />
+                    Статус: @context.Status
+                    <br />
+                    Описание:@context.cargoDescription
                     </GridCol>
                     <GridCol Flex="1">
                         <button style="width:100%" @onclick="() => DeleteOrder(context.id)" type="button" class="btn btn-danger">Удалить</button>
@@ -69,7 +71,10 @@ OnCancel="@HandleCancel">
         <FormItem Label="Order Name">
             <Input @bind-Value="@model.OrderName" Rows="4" />
         </FormItem>
-        <FormItem Label="Описание текста">
+        <FormItem Label="ContractId">
+            <Input @bind-Value="@model.contractId" Rows="4" />
+        </FormItem>
+        <FormItem Label="Описание Груза">
             <InputTextArea style="resize:none; width:100%" @bind-Value="@model.CargoDescription" Rows="6" />
         </FormItem>
     </Form>

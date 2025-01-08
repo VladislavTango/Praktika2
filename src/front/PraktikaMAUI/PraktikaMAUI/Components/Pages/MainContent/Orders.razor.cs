@@ -5,6 +5,7 @@ using System.Text.Json;
 using PraktikaMAUI.Models.ModalModels;
 using System.Text;
 using PraktikaMAUI.Models;
+using System.Diagnostics.Contracts;
 
 namespace PraktikaMAUI.Components.Pages.MainContent
 {
@@ -31,6 +32,14 @@ namespace PraktikaMAUI.Components.Pages.MainContent
         {
             _visible = true;
         }
+
+        private List<SelectModels> list = new List<SelectModels>
+        {
+            new SelectModels {Value = 0 , Name = "Сандарт"},
+            new SelectModels {Value = 1 , Name = "Опасный"},
+            new SelectModels {Value = 2, Name = "Крупный"},
+            new SelectModels {Value = 3, Name = "Жидкий"},
+        };
 
         private async Task GetOrders()
         {
@@ -129,9 +138,10 @@ namespace PraktikaMAUI.Components.Pages.MainContent
 
             var requestData = new
             {
-                clientId = 1,
+                contractId = model.contractId,
+                createdDate = DateTime.UtcNow,
                 orderName = model.OrderName,
-                cargoDescription = model.CargoDescription
+                cargoDescription = model.CargoDescription,
             };
 
             var jsonContent = JsonSerializer.Serialize(requestData);

@@ -1,0 +1,9 @@
+﻿.Item
+{}
+.ant-list-item:hover {
+    background-color: lightcyan;
+}
+.ant-list-item {
+    background-color: red !important;
+    color: red !important;
+}
