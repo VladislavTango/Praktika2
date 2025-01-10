@@ -24,5 +24,11 @@ namespace PraktikaApi.Controllers
             var responce = Mediator.Send(command);
             return Ok(responce);
         }
+        [HttpPut]
+        public IActionResult RedactVehicles([FromBody] VehicleRedactCommand command)
+        {
+            var responce = Mediator.Send(command);
+            return Ok(responce);
+        }
     }
 }

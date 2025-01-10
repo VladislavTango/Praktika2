@@ -27,11 +27,7 @@ namespace PraktikaApplication.TrailerHandlers.Handlers
                 OrderBy = request.SortBy,
             };
 
-            var trailers = await _context.Trailers
-                .ApplyFiltering(gridifyQuery)
-                .ApplyOrdering(gridifyQuery)
-                .Skip((request.PageNumber - 1) * request.PageLength)
-                .Take(request.PageLength)
+            var trailers = await _context.Trailers.Where(x => x.Vehicle == null)
                 .ToListAsync(cancellationToken);
 
             return _mapper.Map<List<TrailerGetListResponse>>(trailers);

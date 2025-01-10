@@ -44,7 +44,7 @@
                     Статус транспорта : @context.Status
                 </GridCol>
                 <GridCol Flex="1">
-                    <button style="width:100%" @* @onclick="() => UpdateTransportation(context)" *@ type="button" class="btn btn-warning">Изменить</button>
+                    <button style="width:100%"  @onclick="() => UpdateVehicle(context)" type="button" class="btn btn-warning">Изменить</button>
                 </GridCol>
             </GridRow>
         </Body>
@@ -100,40 +100,73 @@ OnCancel="@HandleCancel">
 <Modal Title="@("Добавление транспорта")"
 @bind-Visible="@_visibleVehicle"
 OnOk="@AddVehicle"
-OnCancel="@HandleCancel"
-Maximizable="@true"
-DefaultMaximized="@true" >
+OkText="@_AddOkText"
+OnCancel="@HandleCancel">
     <GridRow>
         <GridCol Flex="3">
-            <h3>Прицеп</h3>
-            <AntList DataSource="@TrailerGetListResponse">
-                <ListItem OnClick="() => SetModelValue(context)">
-                    <span>@context.Number</span>
-                </ListItem>
-            </AntList>
+            <h3>Номер прицепа</h3>
+            <div>
+                <RadioGroup @bind-Value="trailerModel">
+                    @foreach (var el in TrailerGetListResponse)
+                    {
+                        <Radio Value="el">@el.Number</Radio>  <br />
+                    }
+                </RadioGroup>
+            </div>
         </GridCol>
         <GridCol Flex="3">
-            <h3>Тягач</h3>
-            <AntList DataSource="@TruckGetListResponse">
-                <ListItem OnClick="() => SetModelValue(context)">
-                    <span>@context.Number</span>
-                </ListItem>
-            </AntList>
+            <h3>Номер тягача</h3>
+            <div>
+                <RadioGroup @bind-Value = "truckModel">
+                    @foreach (var el in TruckGetListResponse)
+                    {
+                        <Radio Value="el">@el.Number</Radio>  <br />
+                    }
+                </RadioGroup>
+            </div>
         </GridCol>
     </GridRow>
 </Modal>
 
-@code {
+
+<Modal Title="@("Редактирование транспорта")"
+@bind-Visible="@_visibleRedactVehicle"
+OnOk="@RedactVehicle"
+OnCancel="@HandleCancel">
+    <Form Model="@vehicleRedactModel"
+    LabelColSpan="8"
+    WrapperColSpan="16"
+    OnFinish="OnVehicleRedactFinish"
+    @ref="@_vehicleForm">
+        <FormItem Label="Номер прицепа">
+            <Input @bind-Value="@vehicleRedactModel.TrailerNumber" Rows="4" />
+        </FormItem>
+
+        <FormItem Label="Номер тягача">
+            <Input @bind-Value="@vehicleRedactModel.TruckNumber" Rows="4" />
+        </FormItem>
+        <FormItem Label="Статус транспорта">
+            <Switch @bind-Checked="vehicleRedactModel.Status" />
+        </FormItem>
+    </Form>
+</Modal>
+
+@code 
+{
+    private string _AddOkText = "Добавить транспорт";
+
     private List<VehicleListResponse> VehicleResponse = new List<VehicleListResponse>();
     private List<TrailerGetListResponse> TrailerGetListResponse = new List<TrailerGetListResponse>();
     private List<TruckGetListResponse> TruckGetListResponse = new List<TruckGetListResponse>();
 
     private Form<TrailerGetListResponse> _Trailerform { get; set; }
     private Form<TruckGetListResponse> _Truckform { get; set; }
+    private Form<VehicleRedactModel> _vehicleForm { get; set; }
 
     private TrailerGetListResponse trailerModel = new TrailerGetListResponse();
     private TruckGetListResponse truckModel = new TruckGetListResponse();
     private VehicleListResponse vehicleModel = new VehicleListResponse();
+    private VehicleRedactModel vehicleRedactModel = new VehicleRedactModel();
 
     private bool _submittingTrailer = false;
     private bool _visibleTrailer = false;
@@ -141,6 +174,9 @@ DefaultMaximized="@true" >
     private bool _visibleTruck = false;
     private bool _submittingVehicle = false;
     private bool _visibleVehicle = false;
+    private bool _visibleRedactVehicle = false;
+    private bool _submittingRedactVehicle = false;
+
 
     private List<SelectModels> TrailerTypeList = new List<SelectModels>
         {
@@ -314,6 +350,13 @@ DefaultMaximized="@true" >
         _submittingVehicle = false;
         _visibleVehicle = false;
     }
+    private void OnVehicleRedactFinish(EditContext editContext)
+    {
+        _submittingRedactVehicle = false;
+        _visibleRedactVehicle = false;
+    }
+
+
 
     private void HandleCancel(MouseEventArgs e)
     {
@@ -382,16 +425,46 @@ DefaultMaximized="@true" >
         _visibleVehicle = false;
         _submittingVehicle = false;
     }
-    private async Task SetModelValue<T>(T model) where T : class
+    private async Task RedactVehicle(MouseEventArgs e)
     {
-        if (model is TrailerGetListResponse trailer)
+        _visibleRedactVehicle = true;
+        string url = "https://localhost:7012/api/Vehicle";
+        var vehicleRequest = new
         {
-            trailerModel = trailer;
-        }
-        else if (model is TruckGetListResponse truck)
+            Id = vehicleRedactModel.Id,
+            TruckNumber = vehicleRedactModel.TruckNumber,
+            TrailerNumber = vehicleRedactModel.TrailerNumber,
+            Status = vehicleRedactModel.Status
+        };
+
+        var jsonContent = new StringContent(
+                JsonSerializer.Serialize(vehicleRequest),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+        using var httpClient = new HttpClient();
+
+        httpClient.DefaultRequestHeaders.Authorization =
+    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var response = await httpClient.PutAsync(url, jsonContent);
+
+
+        if (response.IsSuccessStatusCode)
         {
-            truckModel = truck;
+            GetVehicles();
         }
-        StateHasChanged();
+        else
+        {
+            string error = await ResponseErrorCatcher.ErrorCatcher(response);
+            Error(error);
+        }
+        _vehicleForm.Submit();
+    }
+    private async Task UpdateVehicle(VehicleListResponse el)
+    {
+        vehicleRedactModel.Id = el.Id;
+        _visibleRedactVehicle = true;
     }
 }
